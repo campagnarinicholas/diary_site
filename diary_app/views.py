@@ -66,22 +66,20 @@ def entry_list(request):
     })
 
 @login_required(login_url='./signin')
-def entry_type_list(request, pk):
+def entry_type_entry_list(request, pk):
     entry_type = EntryType.objects.filter(user=request.user, pk=pk)
     entries = Entry.objects.filter(entry_type__in=list(entry_type))
     recent_entries = entries.filter()
-    total = 0
+    total = sum(entry.length for entry in entries)
     weekly_avg = 0
-    for entry in entries:
-        total += entry.length
-
      
     table = EntryTable(entries)
 
-    return render(request, "diary_app/entry_type_list.html",
+    return render(request, "diary_app/entry_type_entry_list.html",
     {
         "table": table,
-        "total": total
+        "total": total,
+        "type_pk": pk
     })
 
 @login_required(login_url='./signin')
@@ -116,6 +114,21 @@ class EntryCreateView(CreateView):
     model = Entry
     form_class = EntryForm
     success_url = '../'
+    slug_field = 'pk'
+    slug_url_kwarg = 'pk'
+    
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super(EntryCreateView,
+                        self).get_form_kwargs(*args, **kwargs)
+        # Pass the current user to the form constructor
+        form_kwargs['user'] = self.request.user
+        form_kwargs['pk'] = self.kwargs.get('pk')
+        return form_kwargs
+
+    def get_initial(self):
+        pk = self.kwargs.get('pk')
+        return self.form_class.get_initial( pk )
 
 class EntryListView(ListView):
     model = Entry

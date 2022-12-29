@@ -5,7 +5,8 @@
         <title>List in Entry Types</title>
     </head>
     <body>
-        <p>Total hours practiced - {{ total }}</p>
+        <a href="{% url 'diary_app:create_typed_entry' type_pk %}">Create New Entry?</a>
+        <p><b>Total hours practiced - </b> {{ total }}</p>
         {% render_table table %}
     </body>
 {% endblock %}

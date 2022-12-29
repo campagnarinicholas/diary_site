@@ -1,0 +1,10 @@
+{% extends './index.html' %}
+{% block content %}
+    <p>Name: {{ object }}</p>
+    <p>Practicing since: {{ object.start_date }}</p>
+    <p>Started {{ object.start_date|timesince }} ago!</p>
+    <p><b>All sessions</b></p>
+    {% for entry in object.entry_set.all %}
+        <p>{{ entry.started_at }} - {{ entry.length }} hours</p>
+    {% endfor %}
+{% endblock %}

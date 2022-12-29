@@ -1,0 +1,11 @@
+{% extends "./index.html" %}
+{% block title %}Create Entry Type{% endblock %}
+
+{% block content %}
+    <h2>Create Entry Type</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Save">
+    </form>
+{% endblock %}

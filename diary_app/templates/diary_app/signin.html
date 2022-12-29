@@ -1,0 +1,12 @@
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+    <h2>Sign in</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Sign in</button>
+    </form>
+    Don't have an account?
+    <a href="{% url 'diary_app:signup' %}">Sign up</a>
+{% endblock %}

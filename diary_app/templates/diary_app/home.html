@@ -1,0 +1,8 @@
+{% extends "./index.html" %}
+{% block content %}
+    <h1><b>Welcome {{ request.user.username }}</b></h1>
+    <p><b>Entry Types</b></p>
+    {% for entry_type in entry_types %}
+        <p><a href="{% url 'diary_app:entry_type' entry_type.id %}">{{entry_type}}</a> - Started at {{entry_type.start_date}}</p>
+    {% endfor %}
+{% endblock %}

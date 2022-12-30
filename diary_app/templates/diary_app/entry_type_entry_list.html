@@ -7,6 +7,10 @@
     <body>
         <a href="{% url 'diary_app:create_typed_entry' type_pk %}">Create New Entry?</a>
         <p><b>Total hours practiced - </b> {{ total }}</p>
+        <p>
+            <b>Practiced for an average of <i>{{ weekly_avg_length }} hours</i> across <i>{{ sessions_this_week }} sessions</i> 
+            for a total of <i>{{ hours_this_week }} hours</i>!</b>
+        </p>
         {% render_table table %}
     </body>
 {% endblock %}

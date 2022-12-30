@@ -13,4 +13,3 @@ class Entry(models.Model):
     started_at = models.DateTimeField('started at', auto_now_add=True)
     length = models.IntegerField(default=0)
     entry_type = models.ForeignKey(EntryType, on_delete=models.CASCADE)
-

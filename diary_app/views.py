@@ -7,6 +7,7 @@ from django.views.generic import CreateView, DetailView, ListView
 from .models import EntryType, Entry
 from .forms import EntryTypeForm, EntryForm
 from .tables import EntryTable, EntryTypeTable
+from django.utils import timezone
 
 def signup(request):
     if request.user.is_authenticated:
@@ -69,23 +70,33 @@ def entry_list(request):
 def entry_type_entry_list(request, pk):
     entry_type = EntryType.objects.filter(user=request.user, pk=pk)
     entries = Entry.objects.filter(entry_type__in=list(entry_type))
-    recent_entries = entries.filter()
     total = sum(entry.length for entry in entries)
-    weekly_avg = 0
-     
+    
+    recent_entries = [entry for entry in entries if (timezone.now() - entry.started_at).days < 7]
+    sessions_this_week = len(recent_entries)
+    hours_this_week = sum(entry.length for entry in recent_entries)
+    if(sessions_this_week > 0):
+        weekly_avg_length = round(hours_this_week / sessions_this_week, 1)
+    else:
+        weekly_avg_length = 0
+
     table = EntryTable(entries)
 
     return render(request, "diary_app/entry_type_entry_list.html",
     {
         "table": table,
         "total": total,
-        "type_pk": pk
+        "type_pk": pk,
+        "weekly_avg_length": weekly_avg_length,
+        "sessions_this_week": sessions_this_week,
+        "hours_this_week": hours_this_week
     })
 
 @login_required(login_url='./signin')
 def delete_entry(request, pk):
     entry = Entry.objects.filter(pk=pk)
     entry.delete()
+
     return redirect('/diary_app/entry_list')
 
 class EntryTypeCreateView(CreateView):

@@ -5,7 +5,7 @@
         <title>List of Entries</title>
     </head>
     <body>
-        <a href="{% url 'diary_app:create_entry' %}">Create New Entry?</a>
+        <a href="{% url 'diary_app:create_entry' %}" role="button" class="btn btn-primary btn-block">Create New <i>{{entry_type}}</i> Entry?</a>
         {% render_table table %}
     </body>
 {% endblock %}

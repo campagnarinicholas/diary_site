@@ -24,10 +24,10 @@ class EntryForm(forms.ModelForm):
         self.entry_type = kwargs.pop('pk')            
         super(EntryForm, self).__init__(*args, **kwargs)
         
-        if self.entry_type is not None:
+        """if self.entry_type is not None:
             self.fields['entry_type'].queryset = EntryType.objects.filter(pk=self.entry_type)
-        else:    
-            self.fields['entry_type'].queryset = EntryType.objects.filter(user=self.user)
+        else:   """ 
+        self.fields['entry_type'].queryset = EntryType.objects.filter(user=self.user)
 
     class Meta:
         model = Entry

@@ -5,7 +5,7 @@ from . import views
 
 app_name = 'diary_app' # Add namespace to URLcof
 urlpatterns = [
-    path('', views.home, name='home'),
+    #path('', views.home, name='home'),
     path('signup/', views.signup, name='signup'),
     path('signin/', views.signin, name='signin'),
     path('signout/', views.signout, name='signout'),
@@ -15,6 +15,9 @@ urlpatterns = [
     path('<int:pk>/entry_type/', 
         login_required(views.entry_type_entry_list, login_url='../../signin'), 
         name='entry_type'),
+    path('', 
+        login_required(views.EntryChartView.as_view(), login_url='./signin'), 
+        name='home'),
     path('create_entry/',
         login_required(views.EntryCreateView.as_view(), login_url='../signin'),
         name='create_entry'),

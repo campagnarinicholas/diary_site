@@ -1,4 +1,4 @@
-{% extends "./index.html" %}
+{% extends 'diary_app/index.html'%}
 
 {%block scripts%}
 <script>
@@ -43,11 +43,19 @@ $(document).ready(function(){
 </script>
 {%endblock scripts%}
 
-
 {% block content %}
     <h1><b>Welcome {{ request.user.username }}</b></h1>
+    <h2>Hours Per Entry Type</h2>
+    <canvas id="myChart" width="400" height="100"></canvas>  
     <p><b>Entry Types</b></p>
-    {% for entry_type in entry_types %}
-        <p><a href="{% url 'diary_app:entry_type' entry_type.id %}">{{entry_type}}</a> - Started at {{entry_type.start_date}}</p>
-    {% endfor %}
+    <div class="list-group">
+        {% for entry_type in entry_types %}
+            <a href="{% url 'diary_app:entry_type' entry_type.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{entry_type}}</h5>
+                </div>
+                <small>Started at {{entry_type.start_date}}</small>
+            </a>
+        {% endfor %}
+    </div>
 {% endblock %}

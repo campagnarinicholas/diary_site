@@ -1,16 +1,66 @@
 {% extends './index.html' %}
 {% load render_table from django_tables2 %}
+
 {% block content %}
     <head>
         <title>List in Entry Types</title>
     </head>
     <body>
-        <a href="{% url 'diary_app:create_typed_entry' type_pk %}">Create New Entry?</a>
+        <a href="{% url 'diary_app:create_typed_entry' type_pk %}" role="button" class="btn btn-primary btn-block">Create New <i>{{entry_type}}</i> Entry?</a>
+        <h2>Summary</h2>
         <p><b>Total hours practiced - </b> {{ total }}</p>
         <p>
             <b>Practiced for an average of <i>{{ weekly_avg_length }} hours</i> across <i>{{ sessions_this_week }} sessions</i> 
             for a total of <i>{{ hours_this_week }} hours</i>!</b>
         </p>
+        <h2>Table</h2>
         {% render_table table %}
+        <h2>Hours per day this week</h2>
+        <canvas id="myChart" width="400" height="100"></canvas>  
+
     </body>
 {% endblock %}
+
+{%block scripts%}
+<script>
+    
+// jquery function
+$(document).ready(function(){
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: [{%for date in dates %}"{{ date }}",{%endfor%}], //loop through queryset, 
+                datasets: [{
+                    label: 'Hours',
+                    data: [{%for day_sum in day_sums %}{{ day_sum }},{%endfor%}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)', 
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+});
+    });
+</script>
+{%endblock scripts%}

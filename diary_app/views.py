@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.views import generic
 from django.contrib.auth.decorators import login_required
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from .models import EntryType, Entry
 from .forms import EntryTypeForm, EntryForm
-from .tables import EntryTable, EntryTypeTable
+from .tables import EntryTable
 from django.utils import timezone
 
 def signup(request):
@@ -58,6 +57,7 @@ def home(request):
 
 @login_required(login_url='./signin')
 def entry_list(request):
+    # Filter for relevant entry_types
     entry_types = EntryType.objects.filter(user=request.user)
     table = EntryTable(Entry.objects.filter(entry_type__in=list(entry_types)))
 
@@ -68,13 +68,23 @@ def entry_list(request):
 
 @login_required(login_url='./signin')
 def entry_type_entry_list(request, pk):
-    entry_type = EntryType.objects.filter(user=request.user, pk=pk)
-    entries = Entry.objects.filter(entry_type__in=list(entry_type))
+    # Only show entries from this entry_type
+    entry_type = EntryType.objects.get(user=request.user, pk=pk)
+    entries = Entry.objects.filter(entry_type=entry_type)
+
+    # Get relevant info from entries such as average
     total = sum(entry.length for entry in entries)
-    
-    recent_entries = [entry for entry in entries if (timezone.now() - entry.started_at).days < 7]
-    sessions_this_week = len(recent_entries)
-    hours_this_week = sum(entry.length for entry in recent_entries)
+    entries_this_week = [entry for entry in entries if (timezone.now() - entry.started_at).days < 7]
+    day_sums = []
+    dates = []
+    for i in range(0, 8):
+        date = timezone.now() - timezone.timedelta(i)
+        entry_length_on_day_i = [entry.length for entry in entries_this_week if abs(date - entry.started_at) <= timezone.timedelta(.5) ]
+        dates.append(f"{date.month}-{date.day}")
+        day_sum = sum(entry_length_on_day_i)
+        day_sums.append(day_sum)
+    sessions_this_week = len(entries_this_week)
+    hours_this_week = sum(entry.length for entry in entries_this_week)
     if(sessions_this_week > 0):
         weekly_avg_length = round(hours_this_week / sessions_this_week, 1)
     else:
@@ -89,7 +99,10 @@ def entry_type_entry_list(request, pk):
         "type_pk": pk,
         "weekly_avg_length": weekly_avg_length,
         "sessions_this_week": sessions_this_week,
-        "hours_this_week": hours_this_week
+        "hours_this_week": hours_this_week,
+        "entry_type": entry_type,
+        "day_sums": day_sums,
+        "dates": dates
     })
 
 @login_required(login_url='./signin')
@@ -144,3 +157,36 @@ class EntryCreateView(CreateView):
 class EntryListView(ListView):
     model = Entry
     template_name = 'diary_app/entry_list.html'
+
+class EntryTypeChartView(TemplateView):
+    template_name = 'diary_app/entry_type_chart.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pk = self.kwargs.get('pk')
+        context["entries"] = Entry.objects.filter(entry_type__id=pk)
+        return context
+
+class EntryChartView(TemplateView):
+    template_name = 'diary_app/entries_chart.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #user = self.request.user
+        entry_type_set = EntryType.objects.filter(user=self.request.user)
+        entry_types, entry_lengths = [], []
+        for entry_type in entry_type_set:
+            entry_types.append(entry_type.name)
+            entries = Entry.objects.filter(entry_type=entry_type)
+            size = 0
+            for entry in entries:
+                size += entry.length
+            entry_lengths.append( size )
+
+        context["entry_type_names"] = entry_types
+        context["entry_lengths"] = entry_lengths
+        
+        entry_types = EntryType.objects.filter(user=self.request.user)
+        context['entry_types'] = entry_types
+
+        return context

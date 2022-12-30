@@ -9,9 +9,3 @@ class EntryTable(tables.Table):
         model = Entry
         template_name = "django_tables2/semantic.html"
         exclude = ('id',)
-
-class EntryTypeTable(tables.Table):
-    class Meta:
-        model = EntryType
-        template_name = "django_tables2/semantic.html"
-        exclude = ('id',)

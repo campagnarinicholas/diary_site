@@ -7,6 +7,8 @@
     </head>
     <body>
         <a href="{% url 'diary_app:create_typed_entry' type_pk %}" role="button" class="btn btn-primary btn-block">Create New <i>{{entry_type}}</i> Entry?</a>
+        <a href="{% url 'diary_app:stopwatch' type_pk %}" role="button" class="btn btn-primary btn-block">Start new session with <i>{{entry_type}}</i> Entry?</a>
+
         <h2>Summary</h2>
         <p><b>Total hours practiced - </b> {{ total }}</p>
         <p>

@@ -3,10 +3,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.http import HttpResponseRedirect
 from .models import EntryType, Entry
 from .forms import EntryTypeForm, EntryForm
 from .tables import EntryTable
 from django.utils import timezone
+
+signin_url = 'diary_app:signin'
 
 def signup(request):
     if request.user.is_authenticated:
@@ -54,6 +57,25 @@ def home(request):
     entries = [ Entry.objects.filter(entry_type=entry_type) for entry_type in entry_types ]
     
     return render(request, 'diary_app/home.html', {'entry_types':entry_types, 'entries':entries})
+
+@login_required(login_url=signin_url)
+def stopwatch(request, pk):
+    entry_type = EntryType.objects.get(pk=pk)
+    return render(request, 'diary_app/stopwatch.html', {"entry_type": entry_type})
+
+@login_required(login_url=signin_url)
+def send_stopwatch_time(request, pk, seconds):
+    entry_type = EntryType.objects.get(pk=pk)
+    length_in_hours = seconds / 60 / 60
+    entry = Entry(started_at=timezone.now(), length=length_in_hours, entry_type=entry_type)
+    entry.save()
+
+    return render(request, 'diary_app/stopwatch.html', 
+    {
+        "entry_type": entry_type,
+        "entry_created": entry
+    }
+    )
 
 @login_required(login_url='./signin')
 def entry_list(request):
@@ -110,7 +132,8 @@ def delete_entry(request, pk):
     entry = Entry.objects.filter(pk=pk)
     entry.delete()
 
-    return redirect('/diary_app/entry_list')
+    next = request.META.get('HTTP_REFERER', '/')
+    return HttpResponseRedirect(next)
 
 class EntryTypeCreateView(CreateView):
     "View for creating a MyModel belonging to the current user."
@@ -148,6 +171,7 @@ class EntryCreateView(CreateView):
         # Pass the current user to the form constructor
         form_kwargs['user'] = self.request.user
         form_kwargs['pk'] = self.kwargs.get('pk')
+        form_kwargs['seconds'] = self.kwargs.get('seconds')
         return form_kwargs
 
     def get_initial(self):

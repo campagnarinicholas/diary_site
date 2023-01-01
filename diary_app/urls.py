@@ -24,10 +24,14 @@ urlpatterns = [
     path('create_entry/<int:pk>',
         login_required(views.EntryCreateView.as_view(), login_url='diary_app:signin'),
         name='create_typed_entry'),
+    path('create_entry/<int:pk>/<int:seconds>',
+        login_required(views.send_stopwatch_time, login_url='diary_app:signin'),
+        name='create_typed_timed_entry'),
     path('<int:pk>/delete_entry/',
         views.delete_entry,
         name='delete_entry'),    
     path('entry_list/',
         login_required(views.entry_list, login_url="../signin"),
-        name="entry_list")
+        name="entry_list"),
+    path('stopwatch/<int:pk>', views.stopwatch, name='stopwatch')
 ]

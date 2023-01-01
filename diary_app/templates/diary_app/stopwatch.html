@@ -1,0 +1,99 @@
+{% extends './index.html' %}
+
+{%block scripts%}
+<script>
+    window.onload = function () {
+  
+        var seconds = 00; 
+        var tens = 00;
+        
+        var appendSeconds = document.getElementById("seconds");
+        var appendTens = document.getElementById("tens");
+
+        var buttonStart = document.getElementById('button-start');
+        var buttonStop = document.getElementById('button-stop');
+        var buttonReset = document.getElementById('button-reset');
+        var buttonSend = document.getElementById('button-send');
+        var successMsg = document.getElementById('success');
+
+        var Interval;
+      
+        buttonStart.onclick = function() {
+          clearInterval(Interval);
+          Interval = setInterval(startTimer, 1000);
+        }
+        
+        buttonStop.onclick = function() {
+          clearInterval(Interval);
+        }
+        
+      
+        buttonReset.onclick = function() {
+            clearInterval(Interval);
+            tens = "00";
+            seconds = "00";
+            appendTens.innerHTML = tens;
+            appendSeconds.innerHTML = seconds;
+        }
+        
+        function startTimer () {
+            tens++; 
+            
+            if(tens <= 9){
+                appendTens.innerHTML = "0" + tens;
+            }
+            
+            if (tens > 9){
+                appendTens.innerHTML = tens;
+            } 
+            
+            if (tens > 59) {
+                seconds++;
+                appendSeconds.innerHTML = "0" + seconds;
+                tens = 0;
+                appendTens.innerHTML = "0" + 0;
+            }
+            
+            if (seconds > 9){
+                appendSeconds.innerHTML = seconds;
+            }
+        
+        }
+        
+        buttonSend.onclick = function() {
+            $.ajax({
+                type: "POST",
+                url: "../create_entry/{{entry_type.id}}/" + seconds,
+                data: {
+                    "time": seconds,
+                    "csrfmiddlewaretoken": "{{csrf_token}}",
+                },
+                success: function(date) {
+                    console.log("success"),
+                    window.location = "{% url 'diary_app:entry_type' entry_type.id %}";
+                },
+                failure: function(date) {
+                    console.log("failure"),
+                    console.log(seconds)
+                }
+
+            })
+        }
+      
+      }
+</script>
+{%endblock scripts%}
+
+{% block content%}
+<div class="wrapper">
+    <div id="success"></div>
+    <h1>Stopwatch</h1>
+    <h2>Track your <i><a href="{% url 'diary_app:entry_type' entry_type.id %}">{{entry_type}}</a></i> session with ease</h2>
+    <p><span id="seconds">00</span>:<span id="tens">00</span></p>
+    <button id="button-start">Start</button>
+    <button id="button-stop">Stop</button>
+    <button id="button-reset">Reset</button>
+    <button id="button-send">Send Time</button>
+
+</div> 
+{% endblock content %}

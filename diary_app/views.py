@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
@@ -172,7 +172,6 @@ class EntryChartView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        #user = self.request.user
         entry_type_set = EntryType.objects.filter(user=self.request.user)
         entry_types, entry_lengths = [], []
         for entry_type in entry_type_set:

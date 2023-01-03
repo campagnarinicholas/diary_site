@@ -89,11 +89,11 @@
     <div id="success"></div>
     <h1>Stopwatch</h1>
     <h2>Track your <i><a href="{% url 'diary_app:entry_type' entry_type.id %}">{{entry_type}}</a></i> session with ease</h2>
-    <p><span id="seconds">00</span>:<span id="tens">00</span></p>
-    <button id="button-start">Start</button>
-    <button id="button-stop">Stop</button>
-    <button id="button-reset">Reset</button>
-    <button id="button-send">Send Time</button>
+    <h1><span id="seconds">00</span>:<span id="tens">00</span></h1>
+    <button id="button-start" class="btn btn-outline-primary">Start</button>
+    <button id="button-stop" class="btn btn-outline-danger">Stop</button>
+    <button id="button-reset" class="btn btn-outline-warning">Reset</button>
+    <button id="button-send" class="btn btn-outline-success">Send Time</button>
 
 </div> 
 {% endblock content %}

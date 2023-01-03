@@ -171,7 +171,6 @@ class EntryCreateView(CreateView):
         # Pass the current user to the form constructor
         form_kwargs['user'] = self.request.user
         form_kwargs['pk'] = self.kwargs.get('pk')
-        form_kwargs['seconds'] = self.kwargs.get('seconds')
         return form_kwargs
 
     def get_initial(self):
